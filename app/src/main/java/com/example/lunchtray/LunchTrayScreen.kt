@@ -16,11 +16,14 @@
 package com.example.lunchtray
 
 import androidx.annotation.StringRes
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -35,11 +38,33 @@ enum class LunchTrayScreen(@StringRes val title: Int) {
     Checkout(R.string.order_checkout)
 }
 
-// TODO: AppBar
+// AppBar
+@Composable
+fun AppBar(
+    currentScreen: LunchTrayScreen,
+    canNavigateUp: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = currentScreen.title)) },
+        modifier = modifier,
+        navigationIcon = {
+            if (canNavigateUp) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back_button)
+                    )
+                }
+            }
+        }
+    )
+}
 
 @Composable
 fun LunchTrayApp(modifier: Modifier = Modifier) {
-    // TODO: Create Controller and initialization
+    // Create Controller and initialization
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = LunchTrayScreen.valueOf(
@@ -50,8 +75,14 @@ fun LunchTrayApp(modifier: Modifier = Modifier) {
     val viewModel: OrderViewModel = viewModel()
 
     Scaffold(
+        modifier = modifier,
         topBar = {
-            // TODO: AppBar
+            // AppBar
+            AppBar(
+                currentScreen = currentScreen,
+                canNavigateUp = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() }
+            )
         }
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
