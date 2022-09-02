@@ -22,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.lunchtray.ui.OrderViewModel
 
 // Screen enum
@@ -38,6 +40,11 @@ enum class LunchTrayScreen(@StringRes val title: Int) {
 @Composable
 fun LunchTrayApp(modifier: Modifier = Modifier) {
     // TODO: Create Controller and initialization
+    val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = LunchTrayScreen.valueOf(
+        backStackEntry?.destination?.route ?: LunchTrayScreen.Start.name
+    )
 
     // Create ViewModel
     val viewModel: OrderViewModel = viewModel()
